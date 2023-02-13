@@ -1,11 +1,29 @@
 import asyncHandler from "express-async-handler";
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
+import {Track} from  "../models/trackModel.js"
 
-const getAllRequests = asyncHandler(async (req, res) => {
-  res.status(200).json({
-    message: "Hello from user",
-  });
+// @desc    Get's all tracks
+// @route   GET /api/music
+// @access  Public
+const getAllTracks = asyncHandler(async (req, res) => {
+    try {
+        const tracks = await Track.find();
+        res.status(200).json(tracks);
+    } catch (error) {
+        console.log(error)
+        res.status(400).json({
+            error: "There was an error"
+        })
+    }
 });
+
+// @desc    Get's all requests
+// @route   GET /api/requests
+// @access  Public
+
+const getAllRequests = asyncHandler( async (req, res) => {
+    // Empty
+} )
 
 const addMusicRequest = asyncHandler(async (req, res) => {
   const { name } = req.body;
@@ -40,5 +58,6 @@ const addMusicRequest = asyncHandler(async (req, res) => {
 
 export {
     getAllRequests,
+    getAllTracks,
     addMusicRequest
 }

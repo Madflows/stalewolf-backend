@@ -1,12 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
-import cors from "cors";
 import colors from "colors";
 import userRoutes from "./routes/userRoutes.js";
 import cookieParser from "cookie-parser";
+import { connectDB } from "./config/db.js";
 
 dotenv.config();
-
+connectDB();
 const PORT = 5000;
 
 const app = express();
