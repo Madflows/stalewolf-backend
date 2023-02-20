@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { addMusicRequest, getAllRequests, getAllTracks } from "../controllers/musicController.js";
+import {getAllTracks } from "../controllers/musicController.js";
 
 const router = Router();
 
-router.route("/").get(getAllTracks).post(addMusicRequest);
+router.route("/").get(getAllTracks);
 
 
 export default router;

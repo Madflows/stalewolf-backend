@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import colors from "colors";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
+import requestRoutes from "./routes/requestRoutes.js";
 import cookieParser from "cookie-parser";
 import { connectDB } from "./config/db.js";
 
@@ -21,15 +22,16 @@ app.use(
 );
 
 app.use("/api/music", userRoutes);
+app.use("/api/request", requestRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Club request api",
     routes: {
       "list-all-songs": "GET /api/music",
-      "make-a-request (WIP)": "POST /api/requests",
-      "list-all-requests (WIP)": "GET /api/requests",
-      "delete-request (WIP)": "DELETE /api/requests/:id",
+      "make-a-request": "POST /api/requests",
+      "list-all-requests": "GET /api/requests",
+      "mark-as-played": "DELETE /api/requests/:id",
     }
   })
 })
