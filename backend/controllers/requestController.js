@@ -14,7 +14,7 @@ function diff_minutes(dt1) {
 
 const getAllRequests = asyncHandler(async (req, res) => {
   try {
-    const requests = await Request.find();
+    const requests = await Request.find().sort({ createdAt: 1 });
     res.status(200).json(requests);
   } catch (error) {
     console.log(error);
@@ -25,14 +25,13 @@ const getAllRequests = asyncHandler(async (req, res) => {
 });
 
 const addMusicRequest = asyncHandler(async (req, res) => {
-  const { name, cover } = req.body;
+  const { name, cover, year, artist } = req.body;
   const date = new Date().getTime();
 
-  let diff = 0;
+  let isBlocked =
+    req.headers.cookie && req.headers.cookie.includes('block-request');
 
-  let last_requested = req.cookies.last_requested;
-
-  if (!name || !cover) {
+  if (!name || !cover || !year || !artist) {
     res.status(500).json({
       message: 'Provide the name and cover-url of the song',
     });
@@ -42,38 +41,32 @@ const addMusicRequest = asyncHandler(async (req, res) => {
   if (requestExists && diff_minutes(requestExists.requestedOn) < 30) {
     res.status(500).json({
       message:
-        'The requested song has already been requested within the last 30min',
+        'Requested less than 30 Minutes ago',
     });
   }
 
-  if (!last_requested) {
-    res.cookie('last_requested', date, {
-      httpOnly: true,
-      secure: true,
-    });
+  if (!isBlocked) {
+    
     const request = await Request.create({
       name,
       cover,
+      year,
+      artist,
       requestedOn: date,
     });
-
+    res.cookie('block-request', true, {
+      maxAge: 1000 * 60 * 5,
+      httpOnly: true,
+      secure: true,
+    });
     res.status(200).json(request);
-  } else {
-    diff = diff_minutes(last_requested);
+    
+  }
+  if (isBlocked) {
 
-    if (diff >= 5) {
-      const request = await Request.create({
-        name,
-        cover,
-        requestedOn: date,
-      });
-
-      res.status(200).json(request);
-    } else {
-      res.status(400).json({
-        message: 'Come on man, you have to wait...',
-      });
-    }
+    res.status(400).json({
+      message: 'Chill with the requests',
+    });
   }
 });
 
