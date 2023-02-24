@@ -33,7 +33,10 @@ app.use(
       return callback(null, true);
     },
     credentials: true,
-    exposedHeaders: ['Access-Control-Allow-Credentials'],
+    exposedHeaders: [
+      'Access-Control-Allow-Credentials',
+      'Access-Control-Allow-Origin',
+    ],
   })
 );
 
