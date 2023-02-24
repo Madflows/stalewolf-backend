@@ -12,7 +12,13 @@ connectDB();
 const PORT = 5000;
 
 const app = express();
-const allowedOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:3001']; // add additional origins as needed
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'http://localhost:3001',
+  'https://club-stale-wolf.vercel.app',
+  'https://stale-wolf.vercel.app'
+]; // add additional origins as needed
 
 app.use(
   cors({
