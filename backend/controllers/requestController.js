@@ -27,25 +27,25 @@ const getAllRequests = asyncHandler(async (req, res) => {
 const addMusicRequest = asyncHandler(async (req, res) => {
   const { name, cover, year, artist } = req.body;
   const date = new Date().getTime();
-
+  const userIp = req.ip;
+  const requestExists = await Request.findOne({ name });
   let isBlocked =
     req.headers.cookie && req.headers.cookie.includes('block-request');
 
   if (!name || !cover || !year || !artist) {
     res.status(500).json({
-      message: 'Provide the name and cover-url of the song',
+      message: 'Please provide the name, cover-url, year and artist field',
     });
   }
 
-  const requestExists = await Request.findOne({ name });
-  if (requestExists && diff_minutes(requestExists.requestedOn) < 30) {
+  if (requestExists) {
     res.status(500).json({
       message:
         'Requested less than 30 Minutes ago',
     });
   }
 
-  if (!isBlocked) {
+  if (!isBlocked && !requestExists) {
     
     const request = await Request.create({
       name,
@@ -53,6 +53,7 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       year,
       artist,
       requestedOn: date,
+      requestedBy: userIp
     });
     res.cookie('block-request', true, {
       maxAge: 1000 * 60 * 5,
@@ -82,4 +83,8 @@ const deleteARequest = asyncHandler(async (req, res) => {
   res.status(200).json(requests);
 });
 
-export { getAllRequests, addMusicRequest, deleteARequest };
+const getMyRequests = asyncHandler(async (req, res) => {
+  
+})
+
+export { getAllRequests, addMusicRequest, deleteARequest, getMyRequests };

@@ -24,6 +24,10 @@ const requestSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    requestedBy: {
+      type: String,
+      required: true
+    },
     isPlayed: {
       type: Boolean,
       default: false,
