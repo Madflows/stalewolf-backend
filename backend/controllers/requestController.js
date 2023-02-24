@@ -28,8 +28,8 @@ const getAllRequests = asyncHandler(async (req, res) => {
 const addMusicRequest = asyncHandler(async (req, res) => {
   const { name, cover, year, artist } = req.body;
   const date = new Date().getTime();
-  const {userId} = req.cookies;
-  const randomId = uuidv4()
+  const { userId } = req.cookies;
+  const randomId = uuidv4();
   const requestExists = await Request.findOne({ name });
   let isBlocked =
     req.headers.cookie && req.headers.cookie.includes('block-request');
@@ -40,8 +40,6 @@ const addMusicRequest = asyncHandler(async (req, res) => {
     });
   }
 
-  
-
   if (!userId) {
     res.cookie('userId', randomId, {
       maxAge: 24 * 60 * 60 * 1000,
@@ -51,14 +49,13 @@ const addMusicRequest = asyncHandler(async (req, res) => {
   }
 
   if (!isBlocked && !requestExists) {
-    
     const request = await Request.create({
       name,
       cover,
       year,
       artist,
       requestedOn: date,
-      requestedBy: userId || randomId
+      requestedBy: userId || randomId,
     });
     res.cookie('block-request', true, {
       maxAge: 1000 * 60 * 5,
@@ -66,10 +63,8 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       secure: true,
     });
     res.status(200).json(request);
-    
   }
   if (isBlocked) {
-
     res.status(400).json({
       message: 'Slow down there, partner!',
     });
@@ -94,7 +89,16 @@ const deleteARequest = asyncHandler(async (req, res) => {
 });
 
 const getMyRequests = asyncHandler(async (req, res) => {
-  
-})
+  const userId = req.cookies['userId'];
+
+  if (!userId) {
+    res.status(200).json([]);
+  }
+  const allMyRequest = await Request.find({ requestedBy: userId }).sort({
+    createdAt: -1,
+  });
+
+  res.status(200).json(allMyRequest);
+});
 
 export { getAllRequests, addMusicRequest, deleteARequest, getMyRequests };
