@@ -45,6 +45,7 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: true,
+      sameSite: 'none',
     });
   }
 
@@ -61,6 +62,7 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       maxAge: 1000 * 60 * 5,
       httpOnly: true,
       secure: true,
+      sameSite: 'none',
     });
     res.status(200).json(request);
   }
@@ -69,7 +71,7 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       message: 'Slow down there, partner!',
     });
   }
-  if (requestExists) {
+  if (requestExists && diff_minutes(requestExists.requestedOn) < 30) {
     res.status(500).json({
       message: 'Requested less than 30 Minutes ago',
     });
