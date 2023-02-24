@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { Request } from '../models/requestModel.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // Function to get difference in minutes between two date
 function diff_minutes(dt1) {
@@ -27,7 +28,8 @@ const getAllRequests = asyncHandler(async (req, res) => {
 const addMusicRequest = asyncHandler(async (req, res) => {
   const { name, cover, year, artist } = req.body;
   const date = new Date().getTime();
-  const userIp = req.ip;
+  const {userId} = req.cookies;
+  const randomId = uuidv4()
   const requestExists = await Request.findOne({ name });
   let isBlocked =
     req.headers.cookie && req.headers.cookie.includes('block-request');
@@ -38,10 +40,13 @@ const addMusicRequest = asyncHandler(async (req, res) => {
     });
   }
 
-  if (requestExists) {
-    res.status(500).json({
-      message:
-        'Requested less than 30 Minutes ago',
+  
+
+  if (!userId) {
+    res.cookie('userId', randomId, {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: true,
     });
   }
 
@@ -53,7 +58,7 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       year,
       artist,
       requestedOn: date,
-      requestedBy: userIp
+      requestedBy: userId || randomId
     });
     res.cookie('block-request', true, {
       maxAge: 1000 * 60 * 5,
@@ -66,7 +71,12 @@ const addMusicRequest = asyncHandler(async (req, res) => {
   if (isBlocked) {
 
     res.status(400).json({
-      message: 'Chill with the requests',
+      message: 'Slow down there, partner!',
+    });
+  }
+  if (requestExists) {
+    res.status(500).json({
+      message: 'Requested less than 30 Minutes ago',
     });
   }
 });
