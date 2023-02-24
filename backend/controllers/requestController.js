@@ -15,7 +15,9 @@ function diff_minutes(dt1) {
 
 const getAllRequests = asyncHandler(async (req, res) => {
   try {
-    const requests = await Request.find().sort({ createdAt: 1 });
+    const requests = await Request.find({ isPlayed: false, isAvailable: true }).sort({
+      createdAt: 1,
+    });
     res.status(200).json(requests);
   } catch (error) {
     console.log(error);
@@ -103,4 +105,21 @@ const getMyRequests = asyncHandler(async (req, res) => {
   res.status(200).json(allMyRequest);
 });
 
-export { getAllRequests, addMusicRequest, deleteARequest, getMyRequests };
+// @desc    Update a request
+// @route   PUT /api/requests/:id
+// @access  Private
+const updateRequest = asyncHandler(async (req, res) => {
+  const request = await Request.findById(req.params.id);
+  if (!request) {
+    res.status(400);
+    throw new Error(`Request with ID ${req.params.id} not found`);
+  }
+
+  const updatedRequest = await Request.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+
+  res.status(200).json(updatedRequest);
+});
+
+export { getAllRequests, addMusicRequest, deleteARequest, getMyRequests, updateRequest };
