@@ -50,7 +50,11 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       sameSite: 'none',
     });
   }
-
+  if (requestExists && diff_minutes(requestExists.requestedOn) < 30) {
+    res.status(500).json({
+      message: 'Requested less than 30 Minutes ago',
+    });
+  }
   if (!isBlocked && !requestExists) {
     const request = await Request.create({
       name,
@@ -73,11 +77,7 @@ const addMusicRequest = asyncHandler(async (req, res) => {
       message: 'Slow down there, partner!',
     });
   }
-  if (requestExists && diff_minutes(requestExists.requestedOn) < 30) {
-    res.status(500).json({
-      message: 'Requested less than 30 Minutes ago',
-    });
-  }
+  
 });
 
 const deleteARequest = asyncHandler(async (req, res) => {
