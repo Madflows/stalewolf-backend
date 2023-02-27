@@ -17,6 +17,21 @@ const getAllTracks = asyncHandler(async (req, res) => {
     }
 });
 
+const getCustomTrack = asyncHandler(async (req, res) => {
+    try {
+        const requestedTrack = req.params.track;
+        res.status(200).json({
+          message: `${requestedTrack} found!`,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+          message: 'Track not found',
+        });
+    }
+})
+
 export {
     getAllTracks,
+    getCustomTrack
 }
