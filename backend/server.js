@@ -1,5 +1,5 @@
 import express from "express";
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 import colors from "colors";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
